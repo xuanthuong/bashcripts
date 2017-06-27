@@ -1,0 +1,51 @@
+# !/bin/bash
+# reference: https://unix.stackexchange.com/questions/121293/convert-every-pdf-in-the-current-directory-to-png
+
+
+# method 1
+# find . -type f -name '*.pdf' -print0 |
+#   while IFS= read -r -d '' file
+#     do convert -verbose -density 500 -resize 800 "${file}" "${file%.*}.png"
+#   done
+
+
+# method 2
+# for pdfile in *.pdf ; do
+#   # convert -verbose -density 120 -resize '800' "${pdfile}"[0] "${pdfile%.*}".png
+#   # convert -verbose -density 120 "${pdfile}"[0] "${pdfile%.*}".png
+#   gs -sDEVICE=png16m -dTextAlphaBits=4 -r300 -o ${output} ${input}
+#   # echo ${pdfile}
+#   # echo ${pdfile%.*}.png
+# done
+
+
+# method 3
+# mogrify -verbose -density 120 -resize 800 -format jpg -path rawSI-img/ atts/*.pdf
+
+
+# method 4
+ input_dir=$1
+ ouput_dir=$2
+ num_file=$3
+ count=0
+ for f in $input_dir/*.pdf
+ do
+  fName="${f##*/}"
+  out_file="$ouput_dir${fName%.*}".png
+  # out_file="$ouput_dir${fName%.*}-%03d".png
+  echo $out_file
+  echo "Converting $f..."
+  gs -sDEVICE=png16m -dTextAlphaBits=4 -r300 -q -o $out_file $f
+  count=$(($count+1))
+  if (( $count >= $num_file )); then
+    break
+  fi
+ done
+
+# count=1
+# for f in *.pdf
+# do
+#   echo "Renaming $f to $count.pdf..."
+#   mv "$f" "./$count.pdf"
+#   count=$((count+1))
+# done
